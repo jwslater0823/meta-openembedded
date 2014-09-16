@@ -35,18 +35,6 @@ SYSTEMD_AUTO_ENABLE_mariadb-server = "disable"
 
 EXTRA_OEMAKE = "'GEN_LEX_HASH=${STAGING_BINDIR_NATIVE}/gen_lex_hash'"
 
-python __anonymous() {
-    # This is a pain but it's the only way to pass these in since
-    # MariaDB's cmake scripts insist on prepending the prefix to the
-    # specified values for INSTALL_*
-    localdata = d.createCopy()
-    localdata.setVar('prefix', '')
-    localdata.setVar('exec_prefix', '')
-    d.setVar('bindir_noprefix', localdata.getVar('bindir', True).lstrip('/'))
-    d.setVar('sbindir_noprefix', localdata.getVar('sbindir', True).lstrip('/'))
-    d.setVar('datadir_noprefix', localdata.getVar('datadir', True).lstrip('/'))
-    d.setVar('libdir_noprefix', localdata.getVar('libdir', True).lstrip('/'))
-}
 
 PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'pam', '', d)}"
 PACKAGECONFIG_class-native = ""
@@ -64,15 +52,15 @@ EXTRA_OECMAKE = "-DWITH_EMBEDDED_SERVER=ON \
                  -DNROFF=FALSE \
                  -DENABLE_DTRACE=FALSE \
                  -DWITH_PIC=ON \
-                 -DINSTALL_DOCDIR:PATH=${datadir_noprefix}/doc/${BPN} \
-                 -DINSTALL_BINDIR:PATH=${bindir_noprefix} \
-                 -DINSTALL_SBINDIR:PATH=${sbindir_noprefix} \
-                 -DINSTALL_SCRIPTDIR:PATH=${bindir_noprefix} \
-                 -DINSTALL_LIBDIR:PATH=${libdir_noprefix} \
-                 -DINSTALL_PLUGINDIR:PATH=${libdir_noprefix}/plugin \
+                 -DINSTALL_DOCDIR:PATH=${datadir}/doc/${BPN} \
+                 -DINSTALL_BINDIR:PATH=${bindir} \
+                 -DINSTALL_SBINDIR:PATH=${sbindir} \
+                 -DINSTALL_SCRIPTDIR:PATH=${bindir} \
+                 -DINSTALL_LIBDIR:PATH=${libdir} \
+                 -DINSTALL_PLUGINDIR:PATH=${libdir}/plugin \
                  -DINSTALL_SYSCONFDIR:PATH=${sysconfdir} \
-                 -DINSTALL_MYSQLSHAREDIR:PATH=${datadir_noprefix}/mysql \
-                 -DINSTALL_SUPPORTFILESDIR:PATH=${datadir_noprefix}/mysql-support-files \
+                 -DINSTALL_MYSQLSHAREDIR:PATH=${datadir}/mysql \
+                 -DINSTALL_SUPPORTFILESDIR:PATH=${datadir}/mysql-support-files \
                  -DMYSQL_DATADIR:PATH=/var/mysql \
                  -DCAT_EXECUTABLE=`which cat` \
                  -DCMAKE_AR:FILEPATH=${AR}"
